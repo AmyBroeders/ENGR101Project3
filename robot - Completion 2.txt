@@ -1,0 +1,102 @@
+
+#include "robot.hpp"
+int main(){
+	if (initClientRobot() !=0){
+		std::cout<<" Error initializing robot"<<std::endl;
+	}
+    double vLeft = 10;
+    double vRight = 10;
+    double vCruise = 10;
+    bool turnRight = false;
+    int rowStandard   = cameraView.height-10; // makes the row we scanning halfway down no point scanning whole image
+    int curPix = 0;
+	double kP = 0.02;
+	int leftCount=0;
+    while(1){
+	
+		 takePicture();
+		SavePPMFile("i0.ppm",cameraView);
+        
+      std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
+       usleep(10000);
+       
+       int pixels[cameraView.width] = {0}; //sets up the array to the width of the image
+       
+       if(turnRight == true){
+		   vLeft = vCruise+5;
+			vRight = vCruise;
+			leftCount++;
+			std::cout<<leftCount<<std::endl;
+			setMotors(vLeft,vRight); 
+			if(leftCount > 10){
+				turnRight = false;
+			}
+			else{
+				continue;
+			}
+			
+			
+	   }
+	   
+	   else{
+       for ( int row =0 ; row < cameraView.height ; row++){
+			
+        for ( int col = 0; col < cameraView.width ; col++){ // loop to add all the values
+			  curPix = get_pixel(cameraView,rowStandard,col,3);			 
+			  if(curPix > 250){		// if current pixel is white adds a 1 to the array
+				 pixels[col] = 1;
+			  }
+				  else{
+					  pixels[col] = 0;  // else adds zero
+					  
+				  }
+			}
+			
+			if(get_pixel(cameraView,rowStandard,5,3) >250){
+				turnRight = true;
+				
+			}
+						 
+			
+		} 
+	}
+		 
+
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		int error = 0;
+		int count = 0;
+	for(int i =0; i <cameraView.width; i++){ // checking to see where on the index the white values are 
+		if(pixels[i] == 1){
+			error += i-cameraView.width/2;
+			count++;		//  adds how many white pixels there are 
+			
+			}
+		}
+	
+	
+vLeft = vCruise + error*kP;
+vRight = vCruise - error*kP;
+
+
+setMotors(vLeft,vRight); 
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+  } //while
+
+} // main
