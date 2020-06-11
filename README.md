@@ -42,7 +42,7 @@ Github: [https://github.com/AmyBroeders/ENGR101Project3](https://github.com/AmyB
 
 - [ ] Amy and Conrad - Tests all installations. Write test cases for the team 
 
-- [ ] Joaquin - Ensures Plan is done. Help to install SFML on all team computers 
+- [x] Joaquin - Ensures Plan is done. Help to install SFML on all team computers 
 
 - [x] Harrison - Get/save pictures from the robot camera
 
@@ -57,7 +57,7 @@ Github: [https://github.com/AmyBroeders/ENGR101Project3](https://github.com/AmyB
 
 - [x] Harrison - In charge of Q2 code
 
-- [ ] Joaquin - Check report, plan meetings for the following week
+- [x] Joaquin - Check report, plan meetings for the following week
 
 - [x] Amy and Conrad - Checks code for Q1 & 2 enables robot to complete circuit, debug/fix if necessary
 
