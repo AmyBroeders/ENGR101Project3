@@ -51,11 +51,11 @@ int main(){
 		}
 		 
 		int error = 0;
-		int count = 0;
+		
 		for(int i =0; i <cameraView.width; i++){ // checking to see where on the index the white values are
 			if(pixels[i] == 1){
 				error += i-cameraView.width/2;
-				count++;		//  adds how many white pixels there are
+				
 			}
 		}
 	
