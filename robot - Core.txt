@@ -1,0 +1,75 @@
+
+#include "robot.hpp"
+int main(){
+	if (initClientRobot() !=0){
+		std::cout<<" Error initializing robot"<<std::endl;
+	}
+    double vLeft = 10;
+    double vRight = 10;
+    int row   = cameraView.height/2; // makes the row we scanning halfway down no point scanning whole image
+    int curPix = 0;
+   
+    while(1){
+		 takePicture();
+		SavePPMFile("i0.ppm",cameraView);
+      setMotors(vLeft,vRight);   
+      std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
+       usleep(10000);
+       
+       int pixels[cameraView.width] = {0}; //sets up the array to the width of the image
+       
+        for ( int col = 0; col < cameraView.width ; col++){ // loop to add all the values
+			  curPix = get_pixel(cameraView,row,col,3);
+			  if(curPix > 250){		// if current pixel is white adds a 1 to the array
+				 pixels[col] = 1;
+			  }
+				  else{
+					  pixels[col] = 0;  // else adds zero
+					  
+				  }
+			} 
+		int count = 0;	 
+		int error = 0;
+	for(int i =0; i <cameraView.width; i++){ // checking to see where on the index the white values are 
+		if(pixels[i] == 1){
+			error += i;
+			count++;		//  adds how many white pixels there are 
+		}
+		
+	}
+		
+ int errorAdjustment = error/count;
+ 
+std::cout<<error<<std::endl;
+		 
+	if(errorAdjustment < (cameraView.width/2)-5){
+		
+		vRight  = vRight + 2; 
+}
+       
+    else if(errorAdjustment > (cameraView.width/2)+5){ 
+     
+     vLeft = vLeft + 2;
+     
+ }
+       
+     else{
+		 vLeft = 10;
+		 vRight = 10;
+		 
+	 } 
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+  } //while
+
+} // main
