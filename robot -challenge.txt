@@ -1,4 +1,3 @@
-
 #include "robot.hpp"
 int main(){
 	if (initClientRobot() !=0){
@@ -8,7 +7,6 @@ int main(){
     double vRight = 10;
     double vCruise = 10;
     int colStandard = (cameraView.width-50)/2;
-   
     
     int rowStandard   = cameraView.height-10; // makes the row we scanning halfway down no point scanning whole image
     int curPix = 0;
@@ -19,102 +17,69 @@ int main(){
 	int straightCount = 0;
 	bool turnLeft = false;
     while(1){
-	 int count = 0;
-		 takePicture();
+		int count = 0;
+		takePicture();
 		SavePPMFile("i0.ppm",cameraView);
         
-      std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
-       usleep(10000);
+		std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
+		usleep(10000);
        
-       int pixels[cameraView.width-50] = {0}; //sets up the array to the width of the image
+		int pixels[cameraView.width-50] = {0}; //sets up the array to the width of the image
       
-      if(turnLeft == true){
-		if(straightCount <= 10){  
-		  straightCount++;
-		   vLeft = vCruise;
-			vRight = vCruise;
-			setMotors(vLeft,vRight);
-		}
-		else{
-			
-			
-		   vLeft = vCruise;
-			vRight = vCruise+20;
-			leftCount++;}
+		if(turnLeft == true){
+			if(straightCount <= 10){  
+				straightCount++;
+				vLeft = vCruise;
+				vRight = vCruise;
+				setMotors(vLeft,vRight);
+			}
+			else{
+				vLeft = vCruise;
+				vRight = vCruise+20;
+				leftCount++;
+			}
 			std::cout<<leftCount<<std::endl;
 			setMotors(vLeft,vRight); 
 			if(leftCount > 20){
-				
 				turnLeft = false;
 				leftCount = 0;
 				straightCount = 0;
-				
 			}
-		
-			
-			
-	   }
-     
-		else{	
-        for ( int col = 0; col < cameraView.width-50; col++){ 
-			  curPix = get_pixel(cameraView,rowStandard,col,0);	
-			  curGreen = get_pixel(cameraView,rowStandard,col,2);
-			  
-
-			  if(curPix > 250 && curGreen < 125){		
-				 pixels[col] = 1;
-				 
-			
-				 
-			  }
-			  
-				  else{
-					  pixels[col] = 0; 
-					  count++; 
-					  
-				  }
-				  if(get_pixel(cameraView,cameraView.height-cameraView.height,6,0) < 250 && get_pixel(cameraView,cameraView.height-95,6,0) < 250 && count == cameraView.width-50){
-					  turnLeft = true;
-				  }
-						
-			}
-			
-			
-		 
 		}
-	 
+		else {	
+			for ( int col = 0; col < cameraView.width-50; col++){ 
+				curPix = get_pixel(cameraView,rowStandard,col,0);	
+				curGreen = get_pixel(cameraView,rowStandard,col,2);
+			  
+				if(curPix > 250 && curGreen < 125){		
+					pixels[col] = 1;
+				}
+				else{
+					pixels[col] = 0; 
+					count++;
+				}
+				if(get_pixel(cameraView,cameraView.height-cameraView.height,6,0) < 250 && get_pixel(cameraView,cameraView.height-95,6,0) < 250 && count == cameraView.width-50){
+					turnLeft = true;
+				}
+			}
+		}
+		
 		int error = 0;
 	
-	for(int i =0; i <cameraView.width-50; i++){ // checking to see where on the index the white values are 
-		if(pixels[i] == 1){
-			
-			error += i-5;
-		
-			
-			
-			}
-			
+		for(int i =0; i <cameraView.width-50; i++){ // checking to see where on the index the white values are 
+			if(pixels[i] == 1){
+				error += i-5;
+			}	
 		}
 		std::cout<<error<<std::endl;
-
 	
-vLeft = vCruise + error*kP;
-vRight = vCruise - error*kP;
+		vLeft = vCruise + error*kP;
+		vRight = vCruise - error*kP;
 
-if(vLeft > 30){
-	
-	vLeft = 60;
-}
+		if(vLeft > 30){
+			vLeft = 60;
+		}
 
-
-
-
-
-setMotors(vLeft,vRight); 
-       
-       
-      
-       
-  } //while
-
+		setMotors(vLeft,vRight);
+	} //while
 } // main
