@@ -11,7 +11,7 @@ int main(){
     int rowStandard   = cameraView.height-10; // makes the row we scanning halfway down no point scanning whole image
     int curPix = 0;
     int curGreen = 0;
-    int farRed = 0;
+
 	double kP = 0.02;
 	int leftCount=0;
 	int straightCount = 0;
@@ -71,7 +71,7 @@ int main(){
 				error += i-5;
 			}	
 		}
-		std::cout<<error<<std::endl;
+		
 	
 		vLeft = vCruise + error*kP;
 		vRight = vCruise - error*kP;
