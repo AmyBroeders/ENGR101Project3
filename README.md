@@ -40,7 +40,7 @@ Github: [https://github.com/AmyBroeders/ENGR101Project3](https://github.com/AmyB
 
 - [x] All] Complete AVC plan
 
-- [ ] Amy and Conrad - Tests all installations. Write test cases for the team 
+- [x] Amy and Conrad - Tests all installations. Write test cases for the team 
 
 - [x] Joaquin - Ensures Plan is done. Help to install SFML on all team computers 
 
