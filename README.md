@@ -51,7 +51,7 @@ Github: [https://github.com/AmyBroeders/ENGR101Project3](https://github.com/AmyB
 
 - [x] [All] Write code so robot 1 & 2 moves through 
 
-- [ ] [All] Intro & Background for report progress report started
+- [x] [All] Intro & Background for report progress report started
 
 - [x] Harrison - In charge of Q1 code
 
