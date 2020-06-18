@@ -1,0 +1,240 @@
+#include "robot.hpp"
+using namespace std;
+
+		//Reused variables.
+	double vLeft = 10;
+	double vRight = 10;
+	double vCruise = 10;
+	double kP = 0.02;
+
+	int curPix = 0;
+	int row   = cameraView.height/2; // (CORE) makes the row we scanning halfway down no point scanning whole image
+
+/* CORE:
+ * Run core code
+ * 
+ */
+ 
+int core(){
+	if (initClientRobot() !=0){
+		std::cout<<" Error initializing robot"<<std::endl;
+	}
+
+   
+    while(1){
+		takePicture();
+		SavePPMFile("i0.ppm",cameraView);
+		setMotors(vLeft,vRight);
+		std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
+		usleep(10000);
+       
+		int pixels[cameraView.width] = {0}; //sets up the array to the width of the image
+       
+        for ( int col = 0; col < cameraView.width ; col++){ // loop to add all the values
+			curPix = get_pixel(cameraView,row,col,3);
+			if(curPix > 250){		// if current pixel is white adds a 1 to the array
+				pixels[col] = 1;
+			}
+			else{
+				pixels[col] = 0;  // else adds zero
+			}
+		}
+		int count = 0;
+		int error = 0;
+		for(int i =0; i <cameraView.width; i++){ // checking to see where on the index the white values are
+			if(pixels[i] == 1){
+				error += i;
+				count++;		//  adds how many white pixels there are
+			}
+		}
+		
+		int errorAdjustment = error/count;
+ 
+		std::cout<<error<<std::endl;
+		 
+		if(errorAdjustment < (cameraView.width/2)-5){
+			vRight  = vRight + 2;
+		}
+		else if(errorAdjustment > (cameraView.width/2)+5){
+			vLeft = vLeft + 2;
+		}
+		else{
+			vLeft = 10;
+			vRight = 10;
+		}
+	} //while
+} //End Core code
+
+
+
+
+/* COMPLETION:
+ * Run completion code.
+ * 
+ */
+
+int completion(){
+	if (initClientRobot() !=0){
+		std::cout<<" Error initializing robot"<<std::endl;
+	}
+    bool turnRight = false;
+    int rowStandard   = cameraView.height-10; // makes the row we scanning halfway down no point scanning whole image
+	int leftCount=0;
+    while(1){
+		takePicture();
+		SavePPMFile("i0.ppm",cameraView);
+        
+		std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
+		usleep(10000);
+       
+		int pixels[cameraView.width] = {0}; //sets up the array to the width of the image
+       
+		if(turnRight == true){
+			vLeft = vCruise+5;
+			vRight = vCruise;
+			leftCount++;
+			std::cout<<leftCount<<std::endl;
+			setMotors(vLeft,vRight); 
+			if(leftCount > 30){
+				turnRight = false;
+			}
+			else{
+				continue;
+			}
+		}
+		else{
+			for ( int row =0 ; row < cameraView.height ; row++){
+				for ( int col = 0; col < cameraView.width ; col++){ // loop to add all the values
+					curPix = get_pixel(cameraView,rowStandard,col,3);			 
+					if(curPix > 250){		// if current pixel is white adds a 1 to the array
+						pixels[col] = 1;
+					}
+					else{
+						pixels[col] = 0;  // else adds zero
+					}
+				}
+				if(get_pixel(cameraView,rowStandard,5,3) >250){
+					turnRight = true;
+				}
+			} 
+		}
+		 
+		int error = 0;
+		int count = 0;
+		for(int i =0; i <cameraView.width; i++){ // checking to see where on the index the white values are 
+			if(pixels[i] == 1){
+				error += i-cameraView.width/2;
+				count++;		//  adds how many white pixels there are 
+			}
+		}
+		
+		vLeft = vCruise + error*kP;
+		vRight = vCruise - error*kP;
+
+		setMotors(vLeft,vRight);     
+	} //while
+} // End Completion Code.
+
+
+
+/* CHALLENGE:
+ * Run challenge code
+ * 
+ */
+
+int challenge(){
+	if (initClientRobot() !=0){
+		std::cout<<" Error initializing robot"<<std::endl;
+	}
+    int colStandard = (cameraView.width-50)/2;
+    
+    int rowStandard   = cameraView.height-10; // makes the row we scanning halfway down no point scanning whole image
+    int curGreen = 0;
+    
+	int leftCount=0;
+	int straightCount = 0;
+	bool turnLeft = false;
+    while(1){
+		int count = 0;
+		takePicture();
+		SavePPMFile("i0.ppm",cameraView);
+        
+		std::cout<<" vLeft="<<vLeft<<"  vRight="<<vRight<<std::endl;
+		usleep(10000);
+       
+		int pixels[cameraView.width-50] = {0}; //sets up the array to the width of the image
+      
+		if(turnLeft == true){
+			if(straightCount <= 10){  
+				straightCount++;
+				vLeft = vCruise;
+				vRight = vCruise;
+				setMotors(vLeft,vRight);
+			}
+			else{
+				vLeft = vCruise;
+				vRight = vCruise+20;
+				leftCount++;
+			}
+			std::cout<<leftCount<<std::endl;
+			setMotors(vLeft,vRight); 
+			if(leftCount > 20){
+				turnLeft = false;
+				leftCount = 0;
+				straightCount = 0;
+			}
+		}
+		else {	
+			for ( int col = 0; col < cameraView.width-50; col++){ 
+				curPix = get_pixel(cameraView,rowStandard,col,0);	
+				curGreen = get_pixel(cameraView,rowStandard,col,2);
+			  
+				if(curPix > 250 && curGreen < 125){		
+					pixels[col] = 1;
+				}
+				else{
+					pixels[col] = 0; 
+					count++;
+				}
+				if(get_pixel(cameraView,cameraView.height-cameraView.height,6,0) < 250 && get_pixel(cameraView,cameraView.height-95,6,0) < 250 && count == cameraView.width-50){
+					turnLeft = true;
+				}
+			}
+		}
+		
+		int error = 0;
+	
+		for(int i =0; i <cameraView.width-50; i++){ // checking to see where on the index the white values are 
+			if(pixels[i] == 1){
+				error += i-5;
+			}	
+		}
+		
+	
+		vLeft = vCruise + error*kP;
+		vRight = vCruise - error*kP;
+
+		if(vLeft > 30){
+			vLeft = 60;
+		}
+
+		setMotors(vLeft,vRight);
+	} //while
+} // End Challenge Code
+
+
+int main(){
+	string versionSet = "core";	//User inputs version
+	std::cout<<"Select version to run: core, completion, challenge. ";
+	std::cin>>versionSet;
+	
+		if(versionSet=="core"){
+			core();
+		}else if(versionSet=="completion"){
+			completion();
+			}else if(versionSet=="challenge"){
+				challenge();
+					}else{
+						std::cout<<"Please enter a valid token. ";
+					}
+} // main
